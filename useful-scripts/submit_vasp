@@ -1,0 +1,96 @@
+#===============================================================================
+# Author: Alison Jensen (ajense28@uwyo.edu)
+# Date:   1/20/26
+# Description: 
+# Submit script to for vasp on MedicineBow for design-lab account. Generates a 
+# run_array_$JOB_NAME file and submits it.
+# to use: ./submit_vasp 
+#===============================================================================
+
+#!/bin/bash
+
+args=("$@")
+
+if ! ((${#args[@]}>=1)); then
+  echo -e "Error: Need minimum 1 arguments --- suggested usage\nsubmit_vasp <job-name> <job-time> <nodes> <tasks-per-node> <cores-per-task> \n"
+  exit 64
+fi
+
+# Variables
+# User email
+USER_MAIL=""
+# Number of Nodes
+NODE=${args[2]:-1}
+# NCORE = NTASK*NCPUS
+# Number of MPI tasks per node:
+TASK=${args[3]:-2}
+# Number of OMP threads per MPI process:
+CPUS=${args[4]:-4}
+# What you'd like your job to be called (e.g. final_final_job_v4):
+JOB_NAME=${args[0]}
+# Memory per node:
+MEM=24GB
+# Time for the job:
+TIME=${args[1]:-12:00:00}
+# Validate TIME format (HH:MM:SS or just hours)
+if ! [[ $TIME =~ ^[0-9]{1,3}:[0-9]{2}:[0-9]{2}$ ]]; then
+    if [[ $TIME =~ ^[0-9]{1,3}$ ]]; then
+        # Convert scalar hours to HH:MM:SS format
+        TIME="$TIME:00:00"
+    else
+        echo "Warning: TIME format '$TIME' is invalid. Using default 12:00:00"
+        TIME="12:00:00"
+    fi
+fi
+
+# Generate particular job submit script
+SCRIPT_NAME=run_$JOB_NAME
+
+PROC=$((NODE * TASK))
+
+cat > $SCRIPT_NAME<<!
+#!/bin/bash
+#SBATCH --job-name=$JOB_NAME
+#SBATCH --time=$TIME
+#SBATCH --nodes=$NODE
+#SBATCH --ntasks-per-node=$TASK
+#SBATCH --cpus-per-task=$CPUS
+#SBATCH --mem=$MEM
+#SBATCH --account=design-lab
+#SBATCH --partition=inv-desousa
+##SBATCH --partition=teton
+#SBATCH --output=output/${JOB_NAME}_%A.out
+#SBATCH --error=output/${JOB_NAME}_%A.err
+#SBATCH --mail-type=ALL
+# #SBATCH --mail-user=$USER_MAIL # change to your email here, if you want to receive emails
+
+cd \$SLURM_SUBMIT_DIR
+
+export OMP_NUM_THREADS=$CPUS
+
+module load gcc/14.2.0 openmpi/5.0.5 fftw/3.3.10-ompi openblas/0.3.24 netlib-scalapack/2.2.0-ompi wannier90/3.1.0 hdf5/1.14.3__hl_True__fortran_True-ompi
+#module load vasp/6.3.2'
+
+start=$(date +'%D %T')
+echo "Start:" $start
+
+/usr/bin/time -o job_statistics.out --verbose srun /project/design-lab/software/VASP/vasp.6.3.2/bin/vasp_std
+
+end=$(date +'%D %T')
+echo "End:" $end
+
+!
+
+JOBID=($(sbatch $SCRIPT_NAME))
+JOBID=${JOBID[3]}
+printf "\n"
+echo "  Job is queued. Job ID is: $JOBID"
+
+start_secs=$(date --date="$start" '+%s')
+end_secs=$(date --date="$end"   '+%s')
+duration=$((end_secs - start_secs))
+
+cat >> $SCRIPT_NAME<<!
+#$JOBID
+
+!
