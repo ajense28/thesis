@@ -1,0 +1,5 @@
+vasp tutorial https://phonopy.github.io/phonopy/vasp.html 
+to print bands:             $ phonopy-bandplot --gnuplot band.yaml
+pdos plot:                  $ phonopy-pdosplot -i '1 2 4 5, 3 6' -o 'pdos.pdf' partial_dos.dat
+thermal properties plot:    $ phonopy-proplot thermal_properties_A.yaml thermal_properties_B.yaml
+dftb https://github.com/phonopy/phonopy/tree/master/example/diamond-dftb

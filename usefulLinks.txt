@@ -1,0 +1,14 @@
+GFN-xTB         https://xtb-docs.readthedocs.io/en/latest/optimization.html
+DFTB+ docs      https://dftbplus-recipes.readthedocs.io/en/latest/basics/firstcalc.html
+DFTB+ manual    https://dftbplus.org/documentation.html
+dptools         https://dptools.readthedocs.io/en/latest/index.html
+phonopy         https://phonopy.github.io/phonopy/
+phonpy DFTB     https://dftbplus-recipes.readthedocs.io/en/latest/properties/phonopy.html
+LAMMPS          https://www.lammps.org/#gsc.tab=0
+VASP            https://www.vasp.at/tutorials/latest/
+KPATH SeekPath  https://www.materialscloud.org/work/tools/seekpath
+
+
+Andersson       https://scholar.google.com/citations?hl=en&user=2FgNyNUAAAAJ&view_op=list_works&sortby=pubdate
+CeO2 dft+U      https://pubs.aip.org/aip/jcp/article/136/4/041101/192134/Communication-Improving-the-density-functional
+CeO2 PDOS       https://www.researchgate.net/publication/275212380_Energy_levels_of_the_Ce_activator_relative_to_the_YAPCe_scintillator_host
